@@ -149,17 +149,40 @@ public:
 	Iterator begin() { return Iterator(arr); };
 	Iterator end() { return Iterator(arr + currSize); };
 
-	//some basic array summation/subtraction
-	//these two will produce a new array
-	//that has a length of min(arr1,arr2)
-	//and is the product of 
-	//this->arr1[i] + other->arr2[i] or this-> arr1[i] - other->arr2[i] 
-	//for i = 0,1,... min(arr1,arr2)
-	//for each cell i in the result array
 public:
+	Array& operator+=(const Array&);
+	Array& operator-=(const Array&);
 	Array operator+(const Array&)const;
 	Array operator-(const Array&)const;
+	Array& operator*(int);
 };
+
+template<typename T>
+Array<T>& Array<T>::operator-=(const Array<T>& other)
+{
+	for (size_t i = 0; i < currSize; ++i)
+		arr[i] -= other.arr[i];
+	
+	return *this;
+}
+
+template<typename T>
+Array<T>& Array<T>::operator+=(const Array<T>& other)
+{
+	for (size_t i = 0; i < currSize; ++i)
+		arr[i] += other.arr[i];
+
+	return *this;
+}
+
+template<typename T>
+Array<T>& Array<T>::operator*(int lambda)
+{
+	for (size_t i = 0; i < currSize; ++i)
+		arr[i] *= lambda;
+
+	return *this;
+}
 
 template<typename T>
 int Array<T>::partition(int leftBound, int rightBound)
