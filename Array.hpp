@@ -14,7 +14,7 @@ private:
 
 	//Big 4
 public:
-	Array() :arr(nullptr), currSize(0), capacity(0) { std::cout << "Default c-tor working.\n"; };
+	Array() :arr(nullptr), currSize(0), capacity(0) {};
 	~Array();
 	Array(const Array&);
 	Array& operator=(const Array&);
@@ -161,7 +161,9 @@ template<typename T>
 Array<T>& Array<T>::operator-=(const Array<T>& other)
 {
 	for (size_t i = 0; i < currSize; ++i)
+	{
 		arr[i] -= other.arr[i];
+	}
 	
 	return *this;
 }
@@ -170,7 +172,9 @@ template<typename T>
 Array<T>& Array<T>::operator+=(const Array<T>& other)
 {
 	for (size_t i = 0; i < currSize; ++i)
+	{
 		arr[i] += other.arr[i];
+	}
 
 	return *this;
 }
@@ -179,7 +183,9 @@ template<typename T>
 Array<T>& Array<T>::operator*(int lambda)
 {
 	for (size_t i = 0; i < currSize; ++i)
+	{
 		arr[i] *= lambda;
+	}
 
 	return *this;
 }
@@ -251,7 +257,9 @@ template<typename T>
 void Array<T>::print()const
 {
 	for (size_t i = 0; i < currSize; ++i)
+	{
 		std::cout << arr[i] << " ";
+	}
 	std::cout << "\n";
 }
 
@@ -260,23 +268,19 @@ Array<T> Array<T>::operator-(const Array<T>& other)const
 {
 	Array<T> result;
 
-		if (currSize <= other.currSize)
+	if (currSize == other.currSize)
+	{
+		result.arr = new T[other.currSize];
+		for (size_t i = 0; i < other.currSize; ++i)
 		{
-			result.arr = new T[currSize];
-			for (size_t i = 0; i < currSize; ++i)
-				result.arr[i] = arr[i] - other.arr[i];
-			result.currSize = currSize;
-			result.capacity = currSize;
+			result.arr[i] = arr[i] - other.arr[i];
 		}
-		else if (currSize > other.currSize)
-		{
-			result.arr = new T[other.currSize];
-			for (size_t i = 0; i < other.currSize; ++i)
-				result.arr[i] = arr[i] - other.arr[i];
 			result.currSize = other.currSize;
-			result.capacity = other.capacity;
-		}
-
+			result.capacity = other.currSize;
+	}
+	else
+		std::logic_error("Vectors needs to be the same length.");
+		
 	return result;
 }
 
@@ -285,22 +289,18 @@ Array<T> Array<T>::operator+(const Array<T>& other)const
 {
 	Array<T> result;
 
-	if (currSize <= other.currSize)
-	{
-		result.arr = new T[currSize];
-		for (size_t i = 0; i < currSize; ++i)
-			result.arr[i] = arr[i] + other.arr[i];
-		result.currSize = currSize;
-		result.capacity = currSize;
-	}
-	else if (currSize > other.currSize)
+	if (currSize == other.currSize)
 	{
 		result.arr = new T[other.currSize];
 		for (size_t i = 0; i < other.currSize; ++i)
+		{
 			result.arr[i] = arr[i] + other.arr[i];
+		}
 		result.currSize = other.currSize;
-		result.capacity = other.capacity;
+		result.capacity = other.currSize;
 	}
+	else
+		std::logic_error("Vectors needs to be the same length.");
 
 	return result;
 }
@@ -356,13 +356,7 @@ void Array<T>::push_back(const T& val)
 {
 	if (currSize >= capacity)
 	{
-		if (capacity == 0)
-		{
-			capacity = 2;
-			resize(capacity);
-		}
-		else
-			resize(capacity * 2);
+		resize(2 * capacity + 1);
 	}
 	arr[currSize] = val;
 	++currSize;
@@ -371,21 +365,18 @@ void Array<T>::push_back(const T& val)
 template<typename T>
 Array<T>::~Array()
 {
-	std::cout << "Destructor working.\n";
 	clear();
 }
 
 template<typename T>
 Array<T>::Array(const Array<T>& other)
 {
-	std::cout << "Regular copy-ctor working.\n";
 	copy(other);
 }
 
 template<typename T>
 Array<T>& Array<T>::operator=(const Array<T>& other)
 {
-	std::cout << "Regular operator= working.\n";
 	if (this != &other)
 	{
 		clear();
@@ -424,7 +415,6 @@ void Array<T>::resize(size_t newSize)
 template<typename T>
 Array<T>& Array<T>::operator=(Array<T>&& other)
 {
-	std::cout << "Move semantics operator= working.\n";
 	if (arr != nullptr)
 		clear();
 	arr = other.arr;
@@ -438,7 +428,6 @@ Array<T>& Array<T>::operator=(Array<T>&& other)
 template<typename T>
 Array<T>::Array(Array<T>&& other)
 {
-	std::cout << "Move semantics copy-ctor working.\n";
 	arr = other.arr;
 	currSize = other.currSize;
 	capacity = other.capacity;
