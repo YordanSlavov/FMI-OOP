@@ -39,7 +39,6 @@ public:
 		
 		//interface
 public:
-		//pointer arithmetic for operator[]
 		//undefined behaviour in case of out of bounds element
 		T& operator*() {return *element;};
 		T* operator->() {return element;};
