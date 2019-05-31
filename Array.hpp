@@ -9,7 +9,7 @@ class Array
 	//essential data
 private:
 	T* arr;
-	size_t currSize; //size_t instead of unsigned int for compatability
+	size_t currSize;
 	size_t capacity;
 
 	//Big 4
@@ -24,7 +24,6 @@ public:
 	Array(Array&&);
 	Array& operator=(Array&&);
 
-	//random access
 	//bidirectional
 public:
 	class BidirectionalIterator
@@ -35,7 +34,7 @@ private:
 
 		//life cycle
 public:
-	    BidirectionalIterator(T* pos = nullptr) :element(pos) {}; //will have element point to where pos is, if no position is specified, our iterator will be null
+	    BidirectionalIterator(T* pos = nullptr) :element(pos) {}; //will have element point to pos, if no position is specified, our iterator will be null
 		
 		//interface
 public:
@@ -45,8 +44,6 @@ public:
 		T* operator->() {return element;};
 
 		//basically support of pointer arithmetic in the way we're used to
-		//and implementing it in the class iteself so as to have the entire code
-		//in one place since iterators aren't very hard to implement
 		BidirectionalIterator& operator++()
 		{ 
 			++element;
@@ -350,7 +347,6 @@ T& Array<T>::operator[](size_t idx)
 	return arr[idx];
 }
 
-//No bounds checking for back/const back methods either
 template<typename T>
 T& Array<T>::back()
 {
