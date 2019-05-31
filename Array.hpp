@@ -24,6 +24,7 @@ public:
 	Array(Array&&);
 	Array& operator=(Array&&);
 
+	
 	//bidirectional
 public:
 	class BidirectionalIterator
@@ -34,7 +35,7 @@ private:
 
 		//life cycle
 public:
-	    BidirectionalIterator(T* pos = nullptr) :element(pos) {}; //will have element point to pos, if no position is specified, our iterator will be null
+	    BidirectionalIterator(T* pos = nullptr) :element(pos) {}; //will have element point to pos is, if no position is specified, our iterator will be null
 		
 		//interface
 public:
@@ -139,7 +140,6 @@ public:
 private:
 	void resizeDown(size_t);
 	void copy(const Array&);
-	int partition(int, int);
 
 	//interface
 public:
@@ -156,8 +156,6 @@ public:
 	void print()const;
 	T& front();
 	const T& front()const;
-	bool binarySearch(const T&, size_t, size_t)const;
-	void quickSort(int, int);
 
 	//useful iterator interface
 public:
@@ -219,57 +217,6 @@ Array<T>& Array<T>::operator*(int lambda)
 	}
 
 	return *this;
-}
-
-template<typename T>
-int Array<T>::partition(int leftBound, int rightBound)
-{
-	int idx = leftBound;
-	T pivot = arr[leftBound];
-
-	for (int i = leftBound+1; i <=rightBound; ++i)
-	{
-		if (arr[i] <= pivot)
-		{
-			++idx;
-			std::swap(arr[i], arr[idx]);
-		}
-	}
-
-	std::swap(arr[idx], arr[leftBound]);
-
-	return idx;
-}
-
-template <typename T>
-void Array<T>::quickSort(int leftBound, int rightBound)
-{
-	if (leftBound < rightBound)
-	{
-		int pivotIndex = partition(leftBound, rightBound);
-		quickSort(leftBound, pivotIndex - 1);
-		quickSort(pivotIndex + 1, rightBound);
-	}
-}
-
-//works only on sorted arrays and relies on
-//T type having defined <, > and == operators
-template<typename T>
-bool Array<T>::binarySearch(const T& value, size_t leftBound, size_t rightBound)const
-{
-	//input was off and element is clearly not in array
-	if (leftBound > rightBound) 
-		return false;
-
-	size_t middle = (leftBound + rightBound)/ 2;
-	if (arr[middle]==value)
-		return true;
-	if (arr[middle] > value)
-		return binarySearch(value, leftBound, middle - 1);
-	if (arr[middle] < value)
-		return binarySearch(value, middle + 1, rightBound);
-	
-	return false;
 }
 
 template <typename T>
@@ -334,7 +281,6 @@ Array<T> Array<T>::operator+(const Array<T>& other)const
 
 //no bounds checking for this/non-constant version of this
 //unlike at function of std::vector operator[] doesn't check for bounds
-//and anything outside of bounds is expected to cause undefined behaviour
 template<typename T>
 const T& Array<T>::operator[](size_t idx)const
 {
@@ -436,7 +382,7 @@ void Array<T>::resize(size_t newSize)
 		T* temp = arr;
 		arr = new T[newSize];
 
-		for (size_t i = 0; i < currSize; ++i) //so we can increase our size	
+		for (size_t i = 0; i < currSize; ++i)
 		{
 			arr[i] = temp[i];
 		}
