@@ -27,7 +27,7 @@ public:
 	//random access
 	//bidirectional
 public:
-	class Iterator
+	class BidirectionalIterator
 	{
 		//our pointer to data
 private:
@@ -35,52 +35,56 @@ private:
 
 		//life cycle
 public:
-		Iterator(T* pos = nullptr) :element(pos) {}; //will have element point to where pos is, if no position is specified, our iterator will be null
-
+	    BidirectionalIterator(T* pos = nullptr) :element(pos) {}; //will have element point to where pos is, if no position is specified, our iterator will be null
+		
 		//interface
 public:
 		//pointer arithmetic for operator[]
 		//undefined behaviour in case of out of bounds element
-		T& operator[](size_t idx) { return *(element+idx); }; 
-		T& operator*() { return *element; };
-		T* operator->() { return element; };
+		T& operator*() {return *element;};
+		T* operator->() {return element;};
 
 		//basically support of pointer arithmetic in the way we're used to
 		//and implementing it in the class iteself so as to have the entire code
 		//in one place since iterators aren't very hard to implement
-		Iterator operator-(int num)
-		{
-			Iterator temp(element);
-			return temp -= num;
-		}
-		Iterator operator+(int num)
-		{
-			Iterator temp(element);
-			return temp += num;
-		}
-		Iterator& operator++() 
+		BidirectionalIterator& operator++()
 		{ 
 			++element;
 			return *this; 
 		};
-		Iterator operator++(int dummy) 
+		BidirectionalIterator operator++(int dummy)
 		{
-			Iterator temp(element);
+			BidirectionalIterator temp(element);
 			++element;
 			return temp;
 		};
-		Iterator& operator--() 
+		BidirectionalIterator& operator--()
 		{ 
 			--element;
 			return *this; 
 		};
-		Iterator operator--(int dummy)
+		BidirectionalIterator operator--(int dummy)
 		{
-			Iterator temp(element);
+			BidirectionalIterator temp(element);
 			--element;
 			return temp;
 		};
-		Iterator& operator+=(int num) //+= could receive a negative integer so I have to account for both cases
+
+		//comparison operators
+		bool operator==(const BidirectionalIterator& other)const {return element == other.element;};
+		bool operator!=(const BidirectionalIterator& other)const {return element != other.element;};
+	}; //Array<T>::BidirectionalIterator
+
+	class RandomAcessIterator :public BidirectionalIterator
+	{
+		
+	public:
+
+		RandomAcessIterator(T* pos = nullptr) :BidirectionalIterator(pos) {};
+
+		T& operator[](size_t idx) {return *(element + idx);};  
+
+		RandomAcessIterator& operator+=(int num) 
 		{
 			if (num > 0)
 			{
@@ -90,7 +94,7 @@ public:
 					--num;
 				}
 			}
-				
+
 			else if (num < 0)
 			{
 				while (num)
@@ -99,30 +103,44 @@ public:
 					++num;
 				}
 			}
-				
+
 			return *this;
 		};
-		Iterator& operator-=(int num)
+		RandomAcessIterator& operator-=(int num) 
 		{
 			return *this += -num;
 		};
 
-		int operator-(const Iterator& other) const
+		int operator-(const RandomAcessIterator& other) const
 		{
 			return element - other.element;
 		}
 
-		//comparison operators
-		bool operator==(const Iterator& other)const { return element == other.element; };
-		bool operator!=(const Iterator& other)const {return element != other.element;};
-		bool operator<(const Iterator& other)const { return element < other.element; }; //just comparing their adresses
-		bool operator<=(const Iterator& other)const { return !(element > other.element); }; //<= is the opposite of >
-		bool operator>(const Iterator& other)const { return element > other.element; };
-		bool operator>=(const Iterator& other)const { return !(element < other.element); };//>= is the opposite of <
-	};
+		int operator+(const RandomAcessIterator& other)const
+		{
+			return element + other.element;
+		}
+
+		RandomAcessIterator operator-(int num)
+		{
+			RandomAcessIterator temp(element);
+			return temp -= num;
+		}
+		RandomAcessIterator operator+(int num)
+		{
+			RandomAcessIterator temp(element);
+			return temp += num;
+		}
+
+		bool operator<(const RandomAcessIterator& other)const {return element < other.element;}; //just comparing their adresses
+		bool operator<=(const RandomAcessIterator& other)const {return !(element > other.element);}; //<= is the opposite of >
+		bool operator>(const RandomAcessIterator& other)const {return element > other.element;};
+		bool operator>=(const RandomAcessIterator& other)const {return !(element < other.element);};//>= is the opposite of <
+	}; //Array<T>::RandomAcessIterator
 
 	//helpers
 private:
+	void resizeDown(size_t);
 	void copy(const Array&);
 	int partition(int, int);
 
@@ -132,9 +150,9 @@ public:
 	const T& operator[](size_t)const;
 	void push_back(const T&);
 	void pop_back();
-	size_t size()const { return currSize; };
+	size_t size()const {return currSize;};
 	void resize(size_t);
-	bool empty()const { return currSize==0; }; 
+	bool empty()const {return currSize==0;}; 
 	T& back();
 	const T& back()const;
 	void clear();
@@ -146,8 +164,8 @@ public:
 
 	//useful iterator interface
 public:
-	Iterator begin() { return Iterator(arr); };
-	Iterator end() { return Iterator(arr + currSize); };
+	RandomAcessIterator begin() {return RandomAcessIterator(arr);};
+	RandomAcessIterator end() {return RandomAcessIterator(arr + currSize);};
 
 public:
 	Array& operator+=(const Array&);
@@ -155,7 +173,23 @@ public:
 	Array operator+(const Array&)const;
 	Array operator-(const Array&)const;
 	Array& operator*(int);
-};
+}; //Array<T>
+
+template<typename T>
+void Array<T>::resizeDown(size_t newSize)
+{
+	T* temp = arr;
+	arr = new T[newSize];
+
+	for (size_t i = 0; i < newSize; ++i) 
+	{
+		arr[i] = temp[i];
+	}
+	currSize = newSize;
+	capacity = newSize;
+	delete[]temp;
+	temp = nullptr;
+}
 
 template<typename T>
 Array<T>& Array<T>::operator-=(const Array<T>& other)
@@ -278,9 +312,7 @@ Array<T> Array<T>::operator-(const Array<T>& other)const
 			result.currSize = other.currSize;
 			result.capacity = other.currSize;
 	}
-	else
-		std::logic_error("Vectors needs to be the same length.");
-		
+
 	return result;
 }
 
@@ -299,9 +331,7 @@ Array<T> Array<T>::operator+(const Array<T>& other)const
 		result.currSize = other.currSize;
 		result.capacity = other.currSize;
 	}
-	else
-		std::logic_error("Vectors needs to be the same length.");
-
+	
 	return result;
 }
 
@@ -339,7 +369,7 @@ void Array<T>::pop_back()
 	if (currSize > 0)
 		--currSize;
 	else
-		throw std::logic_error("Container is already empty.");
+		std::cout << "Container is already empty.\n";
 }
 
 template<typename T>
@@ -356,7 +386,7 @@ void Array<T>::push_back(const T& val)
 {
 	if (currSize >= capacity)
 	{
-		resize(2 * capacity + 1);
+		resize((2 * capacity) + 1);
 	}
 	arr[currSize] = val;
 	++currSize;
@@ -401,15 +431,24 @@ void Array<T>::copy(const Array<T>& other)
 template<typename T>
 void Array<T>::resize(size_t newSize)
 {
-	T* temp = arr;
-	arr = new T[newSize];
-	for (size_t i = 0; i < currSize; ++i)
+	if (newSize < currSize)
 	{
-		arr[i] = temp[i];
+		resizeDown(newSize);
 	}
-	capacity = newSize;
-	delete[]temp;
-	temp = nullptr;
+	else
+	{
+		T* temp = arr;
+		arr = new T[newSize];
+
+		for (size_t i = 0; i < currSize; ++i) //so we can increase our size	
+		{
+			arr[i] = temp[i];
+		}
+
+		capacity = newSize;
+		delete[]temp;
+		temp = nullptr;
+	}
 }
 
 template<typename T>
