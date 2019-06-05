@@ -158,8 +158,8 @@ public:
 
 	//useful iterator interface
 public:
-	RandomAcessIterator begin() {return RandomAcessIterator(arr);};
-	RandomAcessIterator end() {return RandomAcessIterator(arr + currSize);};
+	BidirectionalIterator begin() {return BidirectionalIterator(arr);};
+	BidirectionalIterator end() {return BidirectionalIterator(arr + currSize);};
 
 public:
 	Array& operator+=(const Array&);
